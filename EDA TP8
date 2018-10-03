@@ -1,0 +1,124 @@
+EDA TP8
+
+Imagen se puede pensar como matriz de pixeles
+Un pixel son 4 bytes: R (1 byte) , G (1 byte), B (1 byte) , alpha (transparencia)(1 byte).
+
+libreria convierte png en matriz de pixeles (si nosotros abrieramos un png no lo entenderiamos). Descargar .c y .h de la libreria (lodepng se llama)
+
+Para inicializar:
+unsigned lodepng_decode_memory
+
+
+Para decodear:
+unsigned lodepng_decode32
+
+	*********************************************************
+	* Recordar el FREE (loadpng reservo memoria. escribir	*
+	* free(*out);											*
+	*********************************************************
+
+Lo que deberiamos hacer:
+
+int main (void)
+{
+	unsigned char * img;
+	uint width, height;
+	lodepng.decode32_file (&img, &width, &height, "foto.png");
+
+	*********************************************************
+	*	Para saber que tiene cada pixel:					*
+	*	out [0]; // R del pixel 1 -> out[2p] (generico)		*
+	*	out [1]; // G del pixel 2 -> out [2p+1]				*
+	*	out [3]; // B del pixel 3 -> out [2p+2]				*
+	*	out [4]; // alpha del pixel 4 -> out [2p+3]			*
+	*********************************************************
+
+continuando con el main:
+
+	for ( int i =0; i< (width*height*4)) ; i++)
+	{
+		if ( ! (i%3) )out [i]= 255- out[i]; // pone en negativo una imagen y la guarda en foto2
+	}
+
+	lodepng_decode32_file("foto2.png", img,width, height);
+	free (img);
+	return 0;
+
+}
+
+
+
+QUAD TREE (algoritmo):
+
+Tomo primer cuadrante y busco
+- R min, G min, B min
+- R max, G max, B max
+- R promedio, G promedio, B promedio
+- Weight= R max - R min + G max - G min + B max - B min (minimo puede ser 0, maximo puede ser 255 * 3)
+Weight mide cuanto varia: si varia mucho weight es grande, si varia poco weight es chico
+Si weight < threshhold -> varia poco:
+Si varia poco, el cuadrado lo reemplazo con R promedio, G promedio y B promedio
+ si weight > threshhold -> varia mucho:
+ Si varia mucho, lo corto en 4 partes otra vez y analizo esas cuatro partes. Divido hasta que llego a un cuadrante de 1x1. (por esto el tamanio de la imagen tiene que ser potencia de 2 para que sea cuadrada )
+
+Si tengo hijos tengo un nodo, si no tengo hijos tengo una hoja
+
+El threshhold va de 0% a 100%, siendo 100% = 255 *3
+
+al_draw_scaled_bitmap
+
+
+1. La opcion de buscar pngs en el directorio me da una lista de imagenes (arma una lista de imagenes con todos los pngs en el directorio)
+- hacer una lista de imagenes (list <image>) y un allegro_bitmap *.
+- La lista de pngs se la paso a un menu: tiene que hacer:
+	Abre imagenes 
+	muestra de a 9
+	Permite seleccionar / deseleccionar
+	Ejecuta el compresor para cada una de las imagenes seleccionadas
+ 
+ Para hacer la clase image:
+class image{
+	string Filename;
+	ALLEGRO_BITMAP *bitmap;
+	bool selected; // marca si esta seleccionado o no
+	public:
+	toggleSelection();
+	loadBitmap();
+	draw(...); // hay que pensar que parametros pasarle
+	getFileName();
+	isSelected();
+
+};
+************************ otra forma mas generica ***************************
+creo
+list <image> imageList;
+
+otra opcion: (generico para poder reutilizar)
+class container{
+	public:
+	virtual string getFileName(){ return filename;}
+	protected:
+	string FileName;
+};
+
+class image: public container{
+
+	
+}
+
+******************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
